@@ -238,6 +238,5 @@ class Card
           puts "Pot distributed."
         end
 end
-  
   game = Game.new(4)
   game.play_round
