@@ -132,7 +132,40 @@ class Card
         end
       end
     class Player
-
+        attr_accessor :hand, :pot, :folded
+  
+        def initialize(hand)
+          @hand = hand
+          @pot = 1000
+          @folded = false
+        end
+  
+        def discard_cards(deck)
+          puts "Hand: #{hand}"
+          puts "Enter indices of cards to discard (0 2 4); press enter to skip:"
+          input = gets.chomp
+          return if input.empty?
+  
+          indices = input.split.map(&:to_i)
+          hand.discard(indices, deck)
+          puts "New hand: #{hand}"
+        end
+  
+        def action(current_bet)
+          return :fold if folded
+  
+          puts "Pot: #{@pot}. Current bet: #{current_bet}"
+          puts "Fold(f), See(s), or Raise(r)?"
+          action = gets.chomp.downcase
+          case action
+          when 'f' then :fold
+          when 's' then :see
+          when 'r' then :raise
+          else action
+          end
+        end
+      end    
+  
     end
     class Game
         
