@@ -168,6 +168,76 @@ class Card
   
     end
     class Game
+        attr_reader :deck, :players, :pot, :current_bet
+  
+        def initialize(num_players)
+          @deck = Deck.new
+          @players = []
+          num_players.times { @players << Player.new(Hand.new(deck.deal(5))) }
+          @pot = 0
+          @current_bet = 0
+        end
+  
+        def play_round
+          @pot = 0
+          @current_bet = 0
+  
+          players.each do |player|
+            player.discard_cards(deck)
+          end
+  
+          players.each do |player|
+            action = player.action
+            case action
+            when :fold
+              players.delete(player)
+              puts "Player folds."
+            when :see
+              player.pot -= current_bet
+              @pot += current_bet
+              puts "Player sees."
+            when :raise
+              puts "Enter raise amount:"
+              raise_amount = gets.chomp.to_i
+              raise "Invalid raise amount" if raise_amount <= current_bet
+              player.pot -= raise_amount
+              @pot += raise_amount
+              @current_bet = raise_amount
+              puts "Player raises."
+            end
+          end
+  
+          winner = determine_winner
+          distribute_pot(winner)
+        end
+  
+        private
+  
+        def determine_winner
+            best_strength = nil
+            winning_players = []
         
-    end
+            players.each do |player|
+              strength = player.hand.evaluate_strength
+              if best_strength.nil? || strength > best_strength
+                best_strength = strength
+                winning_players = [player]
+              elsif strength == best_strength
+                winning_players << player
+              end
+            end
+    
+            winning_players
+          end
+  
+        def distribute_pot(winning_players)
+          pot_per_player = pot / winning_players.size
+          winning_players.each do |player|
+            player.pot += pot_per_player
+          end
+          puts "Pot distributed."
+        end
 end
+  
+  game = Game.new(4)
+  game.play_round
