@@ -67,6 +67,70 @@ class Card
           end
         end
         end
+        private
+  
+        def sorted_values
+          @cards.map { |card| Deck::VALUES.index(card.value) }.sort.reverse
+        end
+        def straight_flush?
+          straight? && flush?
+        end
+        def straight_flush_value
+          straight_value
+        end
+        def four_of_a_kind?
+          values_count.values.include?(4)
+        end
+        def four_of_a_kind_value
+          values_count.key(4)
+        end
+        def full_house?
+          values_count.values.include?(3) && values_count.values.include?(2)
+        end
+        def full_house_value
+          values_count.select { |_, count| count == 3 }.keys.first
+        end
+        def flush?
+          suits_count.values.include?(5)
+        end
+        def flush_value
+          sorted_values
+        end
+        def straight?
+          (0..3).each { |i| return false unless sorted_values[i] - 1 == sorted_values[i + 1] }
+          true
+        end
+        def straight_value
+          sorted_values.first
+        end
+        def three_of_a_kind?
+          values_count.values.include?(3)
+        end
+        def three_of_a_kind_value
+          values_count.key(3)
+        end
+        def two_pair?
+          values_count.values.count(2) == 2
+        end  
+        def two_pair_value
+          values_count.select { |_, count| count == 2 }.keys.sort.reverse
+        end
+        def one_pair?
+          values_count.values.include?(2)
+        end
+        def one_pair_value
+          values_count.key(2)
+        end
+        def high_card_value
+          sorted_values
+        end
+        def values_count
+          @cards.group_by(&:value).transform_values(&:size)
+        end
+        def suits_count
+          @cards.group_by(&:suit).transform_values(&:size)
+        end
+      end
     class Player
 
     end
